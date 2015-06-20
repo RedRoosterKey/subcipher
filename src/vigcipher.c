@@ -29,14 +29,16 @@
  * purposes.
  */
 
+#include <ctype.h>
 #include <getopt.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
 #include "version.h"
 
-#define MAX_ALPHABET_SIZE 256
+#define MAX_STRING_SIZE 256
 
 const char * HELP =
 		"Usage: vigcipher [OPTION]...\n\
@@ -136,39 +138,31 @@ short findChar(char * alphabet, char ch) {
 	return (-1);
 }
 
-bool applyCipher(char * alphabet, char * key, bool trueToEncrypt,
+/**
+ * Attempts to apply the cipher on STDIN and output results to STDOUT
+ *
+ * Will call exit(EXIT_FAILURE) if passThroughInvalidInput is false and a
+ * character is received from STDIN that is not in the alphabet
+ *
+ * @param alphabet the unique ordered set of characters to encrypt
+ * @param key the ordered set of characters contained within the alphabet
+ *        that indicates the amount to shift input by
+ * @param trueToEncrypt specifies if data should be shifted up to encrypt or
+ *        down to decrypt
+ * @param passThroughInvalidInput specifies if characters from STDIN that are
+ *        not in the alphabet should cause errors or simply be output
+ *        unencrypted
+ * @param toUpper specifies if input should be capitalized
+ * @param toLower specifies if input should be converted to lower case
+ */
+void applyCipher(char * alphabet, char * key, bool trueToEncrypt,
 bool passThroughInvalidInput, bool toUpper, bool toLower) {
-	if (true == toUpper && true == toLower) {
-		fputs("You cannot convert output to both upper case and lower case.\n",
-		stderr);
-		return (true);
-	}
-
-	if (NULL == alphabet || NULL == key) {
-		return (true);
-	}
-
-	short alphabetSize = strlen(alphabet);
-	short keySize = strlen(key);
+	short alphabetSize = strnlen(alphabet, MAX_STRING_SIZE);
+	short keySize = strnlen(key, MAX_STRING_SIZE);
 
 	short indexKey[keySize];
-	if (0 < alphabetSize && 0 < keySize) {
-		bool missingChars = false;
-		for (short i = 0; 0 != key[i]; i++) {
-			short index = findChar(alphabet, key[i]);
-			if (0 > index) {
-				fprintf(stderr,
-						"Key has character '%c' that is not in the alphabet.\n",
-						key[i]);
-				missingChars = true;
-			}
-			indexKey[i] = index;
-		}
-		if (true == missingChars) {
-			return (true);
-		}
-	} else {
-		return (true);
+	for (short i = 0; 0 != key[i]; i++) {
+		indexKey[i] = findChar(alphabet, key[i]);
 	}
 
 	int keyIndex = 0;
@@ -200,9 +194,15 @@ bool passThroughInvalidInput, bool toUpper, bool toLower) {
 		keyIndex = (keyIndex + 1) % keySize;
 		putchar(alphabet[outputIndex]);
 	}
-	return (false);
 }
 
+/**
+ * Main!  Handles program arguments and general execution
+ *
+ * @param argc the number of program arguments
+ * @param argv the program arguments
+ * @return 0 for success, any other value indicates failure
+ */
 int main(int argc, char **argv) {
 	bool errors = false;
 
@@ -211,15 +211,15 @@ int main(int argc, char **argv) {
 	bool passThroughInvalidInput = false;
 	bool toUpper = false;
 	bool toLower = false;
-	char alphabet[MAX_ALPHABET_SIZE + 1] = "";
-	char key[MAX_ALPHABET_SIZE] = "";
+	char alphabet[MAX_STRING_SIZE + 1] = "";
+	char key[MAX_STRING_SIZE] = "";
 	static struct option long_options[] = { { "alphabet", required_argument, 0,
 			'a' }, { "encrypt", no_argument, 0, 'e' }, { "decrypt", no_argument,
 			0, 'd' }, { "help", no_argument, 0, 'h' }, { "key",
-			required_argument, 0, 'k' }, { "lower", no_argument, 0, 'l' }, {
-			"passthru", no_argument, 0, 'p' }, { "predefined-alpha",
-			required_argument, 0, 'q' }, { "upper", no_argument, 0, 'u' }, {
-			"version", no_argument, 0, 'v' }, { 0, 0, 0, 0 } };
+	required_argument, 0, 'k' }, { "lower", no_argument, 0, 'l' }, { "passthru",
+	no_argument, 0, 'p' }, { "predefined-alpha",
+	required_argument, 0, 'q' }, { "upper", no_argument, 0, 'u' }, { "version",
+	no_argument, 0, 'v' }, { 0, 0, 0, 0 } };
 	// Handle command line options
 	while (true) {
 		int option_index = 0;
@@ -230,13 +230,13 @@ int main(int argc, char **argv) {
 			break;
 		switch (option) {
 		case 'a':
-			if (strlen(optarg) > MAX_ALPHABET_SIZE) {
+			if (strnlen(optarg, MAX_STRING_SIZE + 1) > MAX_STRING_SIZE) {
 				fprintf(stderr,
-						"Alphabet is %d long and max supported size is %d.\n",
-						(int) strlen(optarg), MAX_ALPHABET_SIZE);
+						"Alphabet is longer than max supported size of %d.\n",
+						MAX_STRING_SIZE);
 				errors = true;
 			}
-			strncpy(alphabet, optarg, MAX_ALPHABET_SIZE);
+			strncpy(alphabet, optarg, MAX_STRING_SIZE);
 			break;
 		case 'e':
 			encrypt = true;
@@ -250,7 +250,7 @@ int main(int argc, char **argv) {
 			return (EXIT_SUCCESS);
 			break;
 		case 'k':
-			strncpy(key, optarg, MAX_ALPHABET_SIZE);
+			strncpy(key, optarg, MAX_STRING_SIZE);
 			break;
 		case 'l':
 			toLower = true;
@@ -259,14 +259,14 @@ int main(int argc, char **argv) {
 			passThroughInvalidInput = true;
 			break;
 		case 'q':
-			if (0 == strcmp("UC", optarg)) {
-				strncpy(alphabet, UC_ALPHA, MAX_ALPHABET_SIZE);
-			} else if (0 == strcmp("LC", optarg)) {
-				strncpy(alphabet, LC_ALPHA, MAX_ALPHABET_SIZE);
-			} else if (0 == strcmp("AC", optarg)) {
-				strncpy(alphabet, AC_ALPHA, MAX_ALPHABET_SIZE);
-			} else if (0 == strcmp("PRINT", optarg)) {
-				strncpy(alphabet, PRINTABLE, MAX_ALPHABET_SIZE);
+			if (0 == strncmp("UC", optarg, MAX_STRING_SIZE)) {
+				strncpy(alphabet, UC_ALPHA, MAX_STRING_SIZE);
+			} else if (0 == strncmp("LC", optarg, MAX_STRING_SIZE)) {
+				strncpy(alphabet, LC_ALPHA, MAX_STRING_SIZE);
+			} else if (0 == strncmp("AC", optarg, MAX_STRING_SIZE)) {
+				strncpy(alphabet, AC_ALPHA, MAX_STRING_SIZE);
+			} else if (0 == strncmp("PRINT", optarg, MAX_STRING_SIZE)) {
+				strncpy(alphabet, PRINTABLE, MAX_STRING_SIZE);
 			} else {
 				fprintf(stderr, "There is no predefined alphabet \"%s\"\n",
 						optarg);
@@ -290,15 +290,12 @@ int main(int argc, char **argv) {
 		}
 	}
 
+	// Check for input errors before trying to apply cipher
 	if (optind < argc) {
 		fputs("Non-option arguments are not supported.\n", stderr);
 		fputs("Please run with --help for usage options.\n", stderr);
 		errors = true;
 	}
-
-	// Check the required options are provided
-	// These options are fatal.  We cannot call applyCipher without
-	// encrypt/decrypt being properly set
 	if (false == encrypt && false == decrypt) {
 		fputs("Specify if you would like to encrypt or decrypt.\n", stderr);
 		return (EXIT_FAILURE);
@@ -306,20 +303,31 @@ int main(int argc, char **argv) {
 		fputs("You cannot both encrypt and decrypt.\n", stderr);
 		return (EXIT_FAILURE);
 	}
-
-	if (NULL == alphabet || 0 == strlen(alphabet)) {
+	if (NULL == alphabet || 0 == strnlen(alphabet, MAX_STRING_SIZE)) {
 		fputs("No alphabet provided.\n", stderr);
 		errors = true;
+	} else {
+		for (short i = 0; 0 != key[i]; i++) {
+			if (0 > findChar(alphabet, key[i])) {
+				fprintf(stderr,
+						"Key has character '%c' that is not in the alphabet.\n",
+						key[i]);
+				errors = true;
+			}
+		}
 	}
-	if (NULL == key || 0 == strlen(key)) {
+	if (NULL == key || 0 == strnlen(key, MAX_STRING_SIZE)) {
 		fputs("No key provided.\n", stderr);
 		errors = true;
 	}
-
-	if (toUpper) {
+	if (true == toUpper && true == toLower) {
+		fputs("You cannot convert output to both upper case and lower case.\n",
+		stderr);
+		errors = true;
+	} else if (true == toUpper) {
 		stoupper(alphabet);
 		stoupper(key);
-	} else if (toLower) {
+	} else if (true == toLower) {
 		stolower(alphabet);
 		stolower(key);
 	}
@@ -328,9 +336,11 @@ int main(int argc, char **argv) {
 		errors = true;
 	}
 
-	errors |= applyCipher(alphabet, key, encrypt && !decrypt,
-			passThroughInvalidInput, toUpper, toLower);
-	if (true == errors) {
+	// If there are no detected errors, attempt to apply the cipher on STDIN
+	if (false == errors) {
+		applyCipher(alphabet, key, encrypt && !decrypt, passThroughInvalidInput,
+				toUpper, toLower);
+	} else if (true == errors) {
 		return (EXIT_FAILURE);
 	}
 	return (EXIT_SUCCESS);
