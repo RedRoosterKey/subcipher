@@ -196,7 +196,9 @@ Applies an insecure Vigenere cipher on STDIN
                              LC = [a-z]
                              AC = [A-Za-z]
                              PRINT = all printable characters
-  -u, --upper
+  -u, --upper               convert everything to upper case if possible
+                             (may produce an error if this creates duplicate
+                             characters in the alphabet)
   -v, --version             output version information and exit'
 testReturnValue '' 0 '-h'
 testOutput '' "${help}" '-h'
@@ -205,8 +207,8 @@ testOutput '' "${help}" '--help'
 
 # Test version
 testReturnValue '' 0 '-v'
-testOutput '' '0.0.3' '-v'
+testOutput '' '0.0.4' '-v'
 testReturnValue '' 0 '--version'
-testOutput '' '0.0.3' '--version'
+testOutput '' '0.0.4' '--version'
 
 echo "${GREEN}ALL GOOD!${NC}"

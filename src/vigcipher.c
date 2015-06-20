@@ -63,7 +63,9 @@ Applies an insecure Vigenere cipher on STDIN \n\
                              LC = [a-z]\n\
                              AC = [A-Za-z]\n\
                              PRINT = all printable characters\n\
-  -u, --upper\n\
+  -u, --upper               convert everything to upper case if possible\n\
+                             (may produce an error if this creates duplicate\n\
+                             characters in the alphabet)\n\
   -v, --version             output version information and exit\n";
 
 /**
