@@ -4,13 +4,13 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
-../src/subcipher.c 
+../src/vigcipher.c 
 
 OBJS += \
-./src/subcipher.o 
+./src/vigcipher.o 
 
 C_DEPS += \
-./src/subcipher.d 
+./src/vigcipher.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes

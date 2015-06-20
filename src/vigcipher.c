@@ -1,5 +1,5 @@
 /**
- * @file    subcipher.c
+ * @file    vigcipher.c
  * @author  RedRoosterKey
  * @version see version.h
  *
@@ -8,12 +8,12 @@
  *                    GNU GENERAL PUBLIC LICENSE
  *                     Version 3, 29 June 2007
  *
- *    subcipher is free software: you can redistribute it and/or modify
+ *    vigcipher is free software: you can redistribute it and/or modify
  *    it under the terms of the GNU General Public License as published by
  *    the Free Software Foundation, either version 3 of the License, or
  *    (at your option) any later version.
  *
- *    subcipher is distributed in the hope that it will be useful,
+ *    vigcipher is distributed in the hope that it will be useful,
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *    GNU General Public License for more details.
@@ -39,8 +39,8 @@
 #define MAX_ALPHABET_SIZE 256
 
 const char * HELP =
-		"Usage: subcipher [OPTION]... \n\
-Applies an insecure substitution cipher on STDIN \n\
+		"Usage: vigcipher [OPTION]... \n\
+Applies an insecure Vigenere cipher on STDIN \n\
   and outputs \"encrypted\" text on STDOUT\n\
 \n\
   -a, --alphabet=<alphabet> specifies the unique ordered set of characters \n\

@@ -11,7 +11,7 @@ function testOutput() {
     in=${1}
     out=${2}
     options=${3}
-    value=`echo -n ${in} | ${DIR}/../Release/subcipher ${options}`
+    value=`echo -n ${in} | ${DIR}/../Release/vigcipher ${options}`
     if [ "${out}" != "${value}" ]
     then
         echo "${RED}Expected \"${out}\""
@@ -28,7 +28,7 @@ function testErrorOutput() {
     err=${2}
     options=${3}
     set +e
-    value=$((echo -n ${in} | ${DIR}/../Release/subcipher ${options}) 2>&1)
+    value=$((echo -n ${in} | ${DIR}/../Release/vigcipher ${options}) 2>&1)
     set -e
     if [ "${err}" != "${value}" ]
     then
@@ -47,7 +47,7 @@ function testReturnValue() {
     rVal=${2}
     options=${3}
     set +e
-    echo -n ${in} | ${DIR}/../Release/subcipher ${options} > /dev/null 2>&1
+    echo -n ${in} | ${DIR}/../Release/vigcipher ${options} > /dev/null 2>&1
     value=$?
     set -e
     if [ "${rVal}" != "${value}" ]
@@ -171,8 +171,8 @@ testOutput 'the quick brown for jumps over the lazy dog' 'QWW URXUO YGGAK UGV GJ
 testOutput 'QWW URXUO YGGAK UGV GJETP DNIO IZI IPRC ADY' 'the quick brown for jumps over the lazy dog' '-p -d -k word -a abcdefghijklmnopqrstuvwxyz -l'
 
 # Test help
-help='Usage: subcipher [OPTION]... 
-Applies an insecure substitution cipher on STDIN 
+help='Usage: vigcipher [OPTION]... 
+Applies an insecure Vigenere cipher on STDIN 
   and outputs "encrypted" text on STDOUT
 
   -a, --alphabet=<alphabet> specifies the unique ordered set of characters 
