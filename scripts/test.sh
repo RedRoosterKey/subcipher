@@ -3,6 +3,7 @@ set -e
 # set -v
 
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+PROGRAM="${DIR}/../Release/vigcipher"
 RED=`tput setaf 1`
 GREEN=`tput setaf 2`
 NC=`tput sgr0`
@@ -11,7 +12,7 @@ function testOutput() {
     in=${1}
     out=${2}
     options=${3}
-    value=`echo -n ${in} | ${DIR}/../Release/vigcipher ${options}`
+    value=`echo -n ${in} | ${PROGRAM} ${options}`
     if [ "${out}" != "${value}" ]
     then
         echo "${RED}Expected \"${out}\""
@@ -28,7 +29,7 @@ function testErrorOutput() {
     err=${2}
     options=${3}
     set +e
-    value=$((echo -n ${in} | ${DIR}/../Release/vigcipher ${options}) 2>&1)
+    value=$((echo -n ${in} | ${PROGRAM} ${options}) 2>&1)
     set -e
     if [ "${err}" != "${value}" ]
     then
@@ -47,7 +48,7 @@ function testReturnValue() {
     rVal=${2}
     options=${3}
     set +e
-    echo -n ${in} | ${DIR}/../Release/vigcipher ${options} > /dev/null 2>&1
+    echo -n ${in} | ${PROGRAM} ${options} > /dev/null 2>&1
     value=$?
     set -e
     if [ "${rVal}" != "${value}" ]
@@ -70,6 +71,8 @@ testOutput '1234' '2341' '--encrypt --alphabet=1234 --key=1'
 # specify encryption or decryption
 testReturnValue '' 1 '-q UC -k X'
 testErrorOutput '' 'Specify if you would like to encrypt or decrypt.' '-q UC -k X'
+testReturnValue '' 1 '--predefined-alpha=UC --key=X'
+testErrorOutput '' 'Specify if you would like to encrypt or decrypt.' '--predefined-alpha=UC --key=X'
 
 # but not both
 testReturnValue '' 1 '-e -d -q UC -k X'
@@ -171,7 +174,7 @@ testOutput 'the quick brown for jumps over the lazy dog' 'QWW URXUO YGGAK UGV GJ
 testOutput 'QWW URXUO YGGAK UGV GJETP DNIO IZI IPRC ADY' 'the quick brown for jumps over the lazy dog' '-p -d -k word -a abcdefghijklmnopqrstuvwxyz -l'
 
 # Test help
-help='Usage: vigcipher [OPTION]... 
+help='Usage: vigcipher [OPTION]...
 Applies an insecure Vigenere cipher on STDIN 
   and outputs "encrypted" text on STDOUT
 
@@ -202,8 +205,8 @@ testOutput '' "${help}" '--help'
 
 # Test version
 testReturnValue '' 0 '-v'
-testOutput '' '0.0.1' '-v'
+testOutput '' '0.0.2' '-v'
 testReturnValue '' 0 '--version'
-testOutput '' '0.0.1' '--version'
+testOutput '' '0.0.2' '--version'
 
 echo "${GREEN}ALL GOOD!${NC}"

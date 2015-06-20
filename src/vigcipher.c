@@ -23,7 +23,7 @@
  *
  * @section DESCRIPTION
  *
- * Runs a basic substitution cipher on STDOUT and outputs "encrypted" text to
+ * Runs a basic Vigenère cipher on STDOUT and outputs "encrypted" text to
  * STDOUT.  Please note that this mode of encryption has been proven to be
  * completely insecure and should only be used for entertainment or educational
  * purposes.
@@ -39,7 +39,7 @@
 #define MAX_ALPHABET_SIZE 256
 
 const char * HELP =
-		"Usage: vigcipher [OPTION]... \n\
+		"Usage: vigcipher [OPTION]...\n\
 Applies an insecure Vigenere cipher on STDIN \n\
   and outputs \"encrypted\" text on STDOUT\n\
 \n\
@@ -64,12 +64,24 @@ Applies an insecure Vigenere cipher on STDIN \n\
   -u, --upper\n\
   -v, --version             output version information and exit\n";
 
+/**
+ * Applies toupper to every character in the provided string.
+ *
+ * @param string the string to modify
+ * @return void
+ */
 void stoupper(char * string) {
 	for (short index = 0; string[index] != '\0'; index++) {
 		string[index] = toupper(string[index]);
 	}
 }
 
+/**
+ * Applies tolower to every character in the provided string.
+ *
+ * @param string the string to modify
+ * @return void
+ */
 void stolower(char * string) {
 	for (short index = 0; string[index] != '\0'; index++) {
 		string[index] = tolower(string[index]);
@@ -81,18 +93,25 @@ const char * UC_ALPHA = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 const char * LC_ALPHA = "abcdefghijklmnopqrstuvwxyz";
 const char * AC_ALPHA = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 const char * PRINTABLE =
-		" !\"#$%&'()*+,-./0123456789:;<=>?ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
+		" !\"#$%&'()*+,-./0123456789:;<=>?ABCDEFGHIJKLMNOPQRS\
+TUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
 
+/**
+ * Checks if the provided string had an duplicate characters
+ *
+ * @param alphabet
+ * @return true if duplicate characters are detected and false otherwise
+ */
 bool doesAlphabetHaveDuplicates(char * alphabet) {
 	if (NULL == alphabet) {
 		return (false);
 	}
 	unsigned short count[256];
-	for (int i = 0; i < 256; i++) {
+	for (short i = 0; i < 256; i++) {
 		count[i] = 0;
 	}
 
-	for (int i = 0; 0 != alphabet[i]; i++) {
+	for (short i = 0; 0 != alphabet[i]; i++) {
 		if (0 < count[(short) alphabet[i]]) {
 			return (true);
 		}
@@ -101,8 +120,15 @@ bool doesAlphabetHaveDuplicates(char * alphabet) {
 	return (false);
 }
 
-int findChar(char * alphabet, char ch) {
-	for (int i = 0; 0 != alphabet[i]; i++) {
+/**
+ * Searches for the character ch in the string alphabet
+ *
+ * @param alphabet the string search space
+ * @param ch the character being searched for
+ * @return the index of the first instance of ch, or -1 if it was not found
+ */
+short findChar(char * alphabet, char ch) {
+	for (short i = 0; 0 != alphabet[i]; i++) {
 		if (alphabet[i] == ch) {
 			return (i);
 		}
@@ -118,7 +144,7 @@ bool passThroughInvalidInput, bool toUpper, bool toLower) {
 		return (true);
 	}
 
-	if(NULL == alphabet || NULL == key) {
+	if (NULL == alphabet || NULL == key) {
 		return (true);
 	}
 
@@ -128,8 +154,8 @@ bool passThroughInvalidInput, bool toUpper, bool toLower) {
 	short indexKey[keySize];
 	if (0 < alphabetSize && 0 < keySize) {
 		bool missingChars = false;
-		for (int i = 0; 0 != key[i]; i++) {
-			int index = findChar(alphabet, key[i]);
+		for (short i = 0; 0 != key[i]; i++) {
+			short index = findChar(alphabet, key[i]);
 			if (0 > index) {
 				fprintf(stderr,
 						"Key has character '%c' that is not in the alphabet.\n",
@@ -152,7 +178,7 @@ bool passThroughInvalidInput, bool toUpper, bool toLower) {
 			input = toupper(input);
 		if (toLower)
 			input = tolower(input);
-		int inputIndex = findChar(alphabet, input);
+		short inputIndex = findChar(alphabet, input);
 		if (0 > inputIndex) {
 			if (passThroughInvalidInput) {
 				putchar(input);
@@ -164,7 +190,7 @@ bool passThroughInvalidInput, bool toUpper, bool toLower) {
 				exit(EXIT_FAILURE);
 			}
 		}
-		int outputIndex = inputIndex;
+		short outputIndex = inputIndex;
 		if (trueToEncrypt) {
 			outputIndex += (indexKey[keyIndex] + 1);
 		} else {
@@ -190,10 +216,10 @@ int main(int argc, char **argv) {
 	static struct option long_options[] = { { "alphabet", required_argument, 0,
 			'a' }, { "encrypt", no_argument, 0, 'e' }, { "decrypt", no_argument,
 			0, 'd' }, { "help", no_argument, 0, 'h' }, { "key",
-	required_argument, 0, 'k' }, { "lower", no_argument, 0, 'l' }, { "passthru",
-	no_argument, 0, 'p' }, { "predefined-alpha", required_argument, 0, 'q' }, {
-			"upper", no_argument, 0, 'u' }, { "version", no_argument, 0, 'v' },
-			{ 0, 0, 0, 0 } };
+			required_argument, 0, 'k' }, { "lower", no_argument, 0, 'l' }, {
+			"passthru", no_argument, 0, 'p' }, { "predefined-alpha",
+			required_argument, 0, 'q' }, { "upper", no_argument, 0, 'u' }, {
+			"version", no_argument, 0, 'v' }, { 0, 0, 0, 0 } };
 	// Handle command line options
 	while (true) {
 		int option_index = 0;
@@ -280,7 +306,6 @@ int main(int argc, char **argv) {
 		fputs("You cannot both encrypt and decrypt.\n", stderr);
 		return (EXIT_FAILURE);
 	}
-
 
 	if (NULL == alphabet || 0 == strlen(alphabet)) {
 		fputs("No alphabet provided.\n", stderr);
