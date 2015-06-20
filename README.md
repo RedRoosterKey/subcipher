@@ -1,5 +1,5 @@
 # vigcipher
-Simple terminal to apply an insecure Vigenère cipher to STDIN and send results to STDOUT
+Simple terminal program that applies an insecure Vigenère cipher on STDIN and send results to STDOUT
 
 https://en.wikipedia.org/wiki/Vigen%C3%A8re_cipher
 
