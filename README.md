@@ -1,7 +1,7 @@
 # vigcipher
 Simple terminal program that applies an insecure Vigenère cipher on STDIN and send results to STDOUT
 
-https://en.wikipedia.org/wiki/Vigen%C3%A8re_cipher
+[Vigenère cipher](https://en.wikipedia.org/wiki/Vigen%C3%A8re_cipher)
 
 # How to build
 Go into the Release directory and run the following command:
