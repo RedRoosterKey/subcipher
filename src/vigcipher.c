@@ -75,7 +75,8 @@ Applies an insecure Vigenere cipher on STDIN \n\
  * @return void
  */
 void stoupper(char * string) {
-	for (short index = 0; string[index] != '\0'; index++) {
+	for (short index = 0; '\0' != string[index] && index < MAX_STRING_SIZE;
+			index++) {
 		string[index] = toupper(string[index]);
 	}
 }
@@ -87,21 +88,22 @@ void stoupper(char * string) {
  * @return void
  */
 void stolower(char * string) {
-	for (short index = 0; string[index] != '\0'; index++) {
+	for (short index = 0; '\0' != string[index] && index < MAX_STRING_SIZE;
+			index++) {
 		string[index] = tolower(string[index]);
 	}
 }
 
 // Predefined alphabets
-const char * UC_ALPHA = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-const char * LC_ALPHA = "abcdefghijklmnopqrstuvwxyz";
-const char * AC_ALPHA = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-const char * PRINTABLE =
+const char * UC_ALPHA = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";     // Upper-Case Alphabet
+const char * LC_ALPHA = "abcdefghijklmnopqrstuvwxyz";     // Lower-Case Alphabet
+const char * AC_ALPHA = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"; // All-Case Alphabet
+const char * PRINTABLE =                            // All Printable Characters
 		" !\"#$%&'()*+,-./0123456789:;<=>?ABCDEFGHIJKLMNOPQRS\
 TUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
 
 /**
- * Checks if the provided string had an duplicate characters
+ * Checks if the provided string has any duplicate characters
  *
  * @param alphabet
  * @return true if duplicate characters are detected and false otherwise
@@ -115,7 +117,7 @@ bool doesAlphabetHaveDuplicates(char * alphabet) {
 		count[i] = 0;
 	}
 
-	for (short i = 0; 0 != alphabet[i]; i++) {
+	for (short i = 0; 0 != alphabet[i] && i < MAX_STRING_SIZE; i++) {
 		if (0 < count[(short) alphabet[i]]) {
 			return (true);
 		}
@@ -172,7 +174,7 @@ bool passThroughInvalidInput, bool toUpper, bool toLower) {
 	while (EOF != (input = getchar())) {
 		if (toUpper)
 			input = toupper(input);
-		if (toLower)
+		else if (toLower)
 			input = tolower(input);
 		short inputIndex = findChar(alphabet, input);
 		if (0 > inputIndex) {
@@ -219,9 +221,9 @@ int main(int argc, char **argv) {
 			'a' }, { "encrypt", no_argument, 0, 'e' }, { "decrypt", no_argument,
 			0, 'd' }, { "help", no_argument, 0, 'h' }, { "key",
 	required_argument, 0, 'k' }, { "lower", no_argument, 0, 'l' }, { "passthru",
-	no_argument, 0, 'p' }, { "predefined-alpha",
+			no_argument, 0, 'p' }, { "predefined-alpha",
 	required_argument, 0, 'q' }, { "upper", no_argument, 0, 'u' }, { "version",
-	no_argument, 0, 'v' }, { 0, 0, 0, 0 } };
+			no_argument, 0, 'v' }, { 0, 0, 0, 0 } };
 	// Handle command line options
 	while (true) {
 		int option_index = 0;
@@ -342,7 +344,7 @@ int main(int argc, char **argv) {
 	if (false == errors) {
 		applyCipher(alphabet, key, encrypt && !decrypt, passThroughInvalidInput,
 				toUpper, toLower);
-	} else if (true == errors) {
+	} else {
 		return (EXIT_FAILURE);
 	}
 	return (EXIT_SUCCESS);

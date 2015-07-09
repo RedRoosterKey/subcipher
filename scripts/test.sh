@@ -207,8 +207,8 @@ testOutput '' "${help}" '--help'
 
 # Test version
 testReturnValue '' 0 '-v'
-testOutput '' '0.0.4' '-v'
+testOutput '' '0.0.5' '-v'
 testReturnValue '' 0 '--version'
-testOutput '' '0.0.4' '--version'
+testOutput '' '0.0.5' '--version'
 
 echo "${GREEN}ALL GOOD!${NC}"

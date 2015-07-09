@@ -25,7 +25,7 @@ all: vigcipher
 vigcipher: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: GCC C Linker'
-	gcc  -o "vigcipher" $(OBJS) $(USER_OBJS) $(LIBS)
+	gcc -o "vigcipher" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 
