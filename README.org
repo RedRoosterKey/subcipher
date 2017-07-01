@@ -1,15 +1,18 @@
-# vigcipher
+* vigcipher
 Simple terminal program that applies an insecure Vigenère cipher on STDIN and send results to STDOUT
 
-[Vigenère cipher](https://en.wikipedia.org/wiki/Vigen%C3%A8re_cipher)
+[[https://en.wikipedia.org/wiki/Vigen%C3%A8re_cipher][Vigenère cipher]]
 
-# How to build
+* How to build
 Go into the Release directory and run the following command:
-```shell
+
+#+BEGIN_SRC bash
 make all && make test
-```
+#+END_SRC
+
 This will create a program called vigcipher and execute test.sh in the scripts directory.
 If all the tests pass, you should be good to go.  A good start would be to read the help by running:
-```shell
+#+BEGIN_SRC
 ./vigcipher --help
-```
+#+END_SRC
+
