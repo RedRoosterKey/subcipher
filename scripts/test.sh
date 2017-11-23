@@ -1,23 +1,23 @@
-# /bin/bash
+#! /bin/bash
 set -e
 # set -v
 
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 PROGRAM="${DIR}/../Release/vigcipher"
-RED=`tput setaf 1`
-GREEN=`tput setaf 2`
-NC=`tput sgr0`
+RED=$(tput setaf 1)
+GREEN=$(tput setaf 2)
+NC=$(tput sgr0)
 
 function testOutput() {
     in=${1}
     out=${2}
     options=${3}
-    value=`echo -n ${in} | ${PROGRAM} ${options}`
+    value=$(echo -n "${in}" | ${PROGRAM} ${options})
     if [ "${out}" != "${value}" ]
     then
         echo "${RED}Expected \"${out}\""
         echo " but got \"${value}\"${NC}"
-        return -1
+        return 255
     else
         echo "${GREEN}[OK]${NC}"
     fi
@@ -29,33 +29,32 @@ function testErrorOutput() {
     err=${2}
     options=${3}
     set +e
-    value=$((echo -n ${in} | ${PROGRAM} ${options}) 2>&1)
+    value=$( (echo -n "${in}" | ${PROGRAM} ${options}) 2>&1 )
     set -e
     if [ "${err}" != "${value}" ]
     then
         echo "${RED}Expected error \"${err}\""
         echo " but got       \"${value}\"${NC}"
-        return -1
+        return 255
     else
         echo "${GREEN}[OK]${NC}"
     fi
     return 0
 }
 
-
 function testReturnValue() {
     in=${1}
     rVal=${2}
     options=${3}
     set +e
-    echo -n ${in} | ${PROGRAM} ${options} > /dev/null 2>&1
+    echo -n "${in}" | ${PROGRAM} ${options} > /dev/null 2>&1
     value=$?
     set -e
     if [ "${rVal}" != "${value}" ]
     then
         echo "${RED}Expected \"${rVal}\""
         echo " but got \"${value}\"${NC}"
-        return -1
+        return 255
     else
         echo "${GREEN}[OK]${NC}"
     fi
